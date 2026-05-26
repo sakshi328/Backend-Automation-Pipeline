@@ -1,0 +1,227 @@
+{
+  "name": "Task2_Workflow_Saksh",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1264,
+        208
+      ],
+      "id": "3ad35a96-9412-4533-a694-229cf29a3b33",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/search/repositories",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1056,
+        208
+      ],
+      "id": "4bc5c7ba-bd7e-4d7c-8f71-bc6ee464a913",
+      "name": "Fetch Trending GitHub Repos",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Safely fetch data from the previous node\nconst inputData = $input.item.json;\nconst repos = inputData && inputData.items ? inputData.items : [];\n\n// If repositories are found, process top 5\nif (repos.length > 0) {\n    return repos.slice(0, 5).map(repo => ({\n        json: {\n            id: repo.id,\n            name: repo.name,\n            full_name: repo.full_name,\n            stars: repo.stargazers_count,\n            description: repo.description,\n            url: repo.html_url\n        }\n    }));\n} else {\n    // Wrapped under the mandatory 'json' key to avoid n8n errors\n    return [{ \n        json: { \n            api_error: true, \n            message: \"No items found\" \n        } \n    }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -832,
+        208
+      ],
+      "id": "dcd5981e-57ea-4421-8fe9-888b80c4bb89",
+      "name": "Filter & Top 5 Transformation"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1,
+            "type": "mix"
+          },
+          "conditions": [
+            {
+              "id": "check_error",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -608,
+        208
+      ],
+      "id": "e52d697a-ecb0-41ec-a8f1-79977cf3dacb",
+      "name": "Is API Broken?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1,
+            "type": "mix"
+          },
+          "conditions": [
+            {
+              "id": "check_stars",
+              "leftValue": "={{ $json.stars }}",
+              "rightValue": 50000,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        112
+      ],
+      "id": "9a4015a0-1b6a-4a28-acfa-d70d5a2798f9",
+      "name": "If Stars > 50k"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        80,
+        32
+      ],
+      "id": "828ee3ea-4028-4f5e-b763-ba1de74d6dd8",
+      "name": "Route A: Mega Popular Feed"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        80,
+        224
+      ],
+      "id": "67dd64b2-d3a1-4529-a9b7-4ffeae33c4eb",
+      "name": "Route B: Standard Feed"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        352
+      ],
+      "id": "9b27dbc6-43a7-4362-afa8-dca0f26e1400",
+      "name": "Error Fallback Notification"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch Trending GitHub Repos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Trending GitHub Repos": {
+      "main": [
+        [
+          {
+            "node": "Filter & Top 5 Transformation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Top 5 Transformation": {
+      "main": [
+        [
+          {
+            "node": "Is API Broken?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is API Broken?": {
+      "main": [
+        [
+          {
+            "node": "Error Fallback Notification",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Error Fallback Notification": {
+      "main": [
+        [
+          {
+            "node": "If Stars > 50k",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "e6fd8492-7810-4585-af04-87de2b94f29a",
+  "meta": {
+    "instanceId": "99da2809540e3a6a4b01453db4f2f48365fcd5e6df592eed810ce5b848d17b15"
+  },
+  "id": "KGQgudG57BvGz44o",
+  "tags": []
+}
