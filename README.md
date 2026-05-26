@@ -1,3 +1,5 @@
+Task 2 <img width="1858" height="752" alt="Screenshot 2026-05-26 152943" src="https://github.com/user-attachments/assets/61c7a1d1-f71d-4243-9842-6c9eccf189ab" />
+Task3 <img width="906" height="467" alt="Screenshot 2026-05-26 124150" src="https://github.com/user-attachments/assets/32af71ba-993d-40be-90e2-1d1ed45b098d" />
 # Backend-Automation-Pipeline
 “Production-ready backend automation pipelines built using n8n for GitHub REST API data processing and automated application uptime monitoring.”
 ## 📝 Project Description
