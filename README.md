@@ -1,3 +1,7 @@
+I have recorded a comprehensive video walkthrough explaining the architecture, core logic, and error-handling steps for both automation tasks.
+https://github.com/user-attachments/assets/0e5b06ac-34dd-461c-86d0-c8125c0bcfb2
+Uploading Production Pipeline, QA Report, and Health Checks.mp4…
+
 Task 2 <img width="1858" height="752" alt="Screenshot 2026-05-26 152943" src="https://github.com/user-attachments/assets/61c7a1d1-f71d-4243-9842-6c9eccf189ab" />
 Task3 <img width="906" height="467" alt="Screenshot 2026-05-26 124150" src="https://github.com/user-attachments/assets/32af71ba-993d-40be-90e2-1d1ed45b098d" />
 # Backend-Automation-Pipeline
